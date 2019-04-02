@@ -1,0 +1,7 @@
+{
+    "name": "pip-facades-sample-node",
+    "registry": "pipregistry.azurecr.io/pip-services",
+    "version": "1.0.0",
+    "build": 0
+  }
+  

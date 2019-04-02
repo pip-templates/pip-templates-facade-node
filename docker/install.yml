@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: pip
+  name: pip-facades-sample-node-deploy
+  labels:
+    product_pip-facades-sample-node: "true"
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        product_pip-facades-sample-node: "true"
+    spec:
+      containers:
+      - name: pip-facades-sample-node-pod
+        image: pipregistry.azurecr.io/pip-services/pip-facades-sample-node:1.0.0-1-rc
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ENV_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: pip-config
+              key: env_name
+        - name: VERSION
+          valueFrom:
+            configMapKeyRef:
+              name: pip-config
+              key: version
+      imagePullSecrets:
+      - name: azure-container-registry-access
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: pip
+  name: pip-facades-sample-svc
+  labels: 
+    product_pip-facades-sample-node: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    #nodePort: 30018
+    protocol: TCP
+  selector:
+    product_pip-facades-sample-node: "true"
